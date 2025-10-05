@@ -46,7 +46,7 @@ async def _run_agent(
     mcp_args: List[str] = ["@playwright/mcp@latest"]
     if headless:
         mcp_args.append("--headless")
-    server_params = StdioServerParams(command="npx", args=mcp_args)
+    server_params = StdioServerParams(command="playwright-mcp", args=["--headless"])
 
     # 3) Create workbench + agent and run
     async with McpWorkbench(server_params) as mcp:
