@@ -84,10 +84,11 @@ async def _run_agent(
             model_client_stream=True,
             max_tool_iterations=max(1, min(int(max_iters), 50)),
         )
-        console = CaptureConsole(agent.run_stream(task=task))
-        await console.run()
-
-    return last_text or "No final message produced by the agent."
+        result = await agent.run(task=task)
+        try:
+            return result.text if hasattr(result, "text") else str(result)
+        except Exception:
+            return str(result)
 
 
 class Tools:
