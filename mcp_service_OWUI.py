@@ -48,47 +48,23 @@ async def _run_agent(
         mcp_args.append("--headless")
     server_params = StdioServerParams(command="npx", args=mcp_args)
 
-    # 3) Capture the agent's final assistant text
-    last_text: Optional[str] = None
-
-    class CaptureConsole(Console):
-        async def on_message(self, message: Any):
-            nonlocal last_text
-            if getattr(message, "role", None) == "assistant" and getattr(
-                message, "content", None
-            ):
-                content = message.content
-                try:
-                    if isinstance(content, list):
-                        text = "".join(
-                            (
-                                part.get("text", "")
-                                if isinstance(part, dict)
-                                else str(part)
-                            )
-                            for part in content
-                        )
-                    else:
-                        text = str(content)
-                    if text.strip():
-                        last_text = text
-                except Exception:
-                    last_text = str(content)
-
-    # 4) Create workbench + agent and run
+    # 3) Create workbench + agent and run
     async with McpWorkbench(server_params) as mcp:
         agent = AssistantAgent(
             "web_browsing_assistant",
             model_client=_build_model_client(model_override),
             workbench=mcp,
-            model_client_stream=True,
+            model_client_stream=False,  # disable streaming for safety
             max_tool_iterations=max(1, min(int(max_iters), 50)),
         )
         result = await agent.run(task=task)
+
+        # 4) Return agent's reply as string
         try:
             return result.text if hasattr(result, "text") else str(result)
         except Exception:
             return str(result)
+
 
 
 class Tools:
