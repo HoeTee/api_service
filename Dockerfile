@@ -1,18 +1,20 @@
-# Use a lightweight Python image
-FROM python:3.13-slim
+# Python + Node + Playwright browsers preinstalled (needed for Playwright MCP)
+FROM mcr.microsoft.com/playwright/python:v1.48.0-jammy
 
-# Set working directory
 WORKDIR /app
 
-# Copy dependency file and install
+# Python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all source code
+# Install the Playwright MCP server globally so we don't npx-install at runtime
+RUN npm install -g @playwright/mcp@latest
+
+# Your app code
 COPY . .
 
-# Expose port
-EXPOSE 10000
+# Render maps its own port; default to 10000 for local
+ENV PORT=10000
 
-# Start the FastAPI server
+# Start FastAPI (change module name if your file differs)
 CMD ["uvicorn", "api_mcp_service_OWUI:app", "--host", "0.0.0.0", "--port", "10000"]
