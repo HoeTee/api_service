@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y curl gnupg ca-certificates \
 
 # Install Playwright MCP globally
 RUN npm install -g @playwright/mcp@latest
+RUN npx -y playwright@1.48.0 install --with-deps chromium
 
 # Set working directory
 WORKDIR /app
@@ -27,4 +28,5 @@ EXPOSE 10000
 
 # Start FastAPI server
 CMD ["uvicorn", "api_mcp_service_OWUI:app", "--host", "0.0.0.0", "--port", "10000"]
+
 
