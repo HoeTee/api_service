@@ -47,8 +47,8 @@ async def _run_agent(
     if headless:
         mcp_args.append("--headless")
     server_params = StdioServerParams(
-        command="node",
-        args=["/usr/local/lib/node_modules/@playwright/mcp/dist/cli.js", "--headless"]
+        command="/usr/local/bin/playwright-mcp",
+        args=["--headless"]
     )
 
     # 3) Create workbench + agent and run
@@ -151,4 +151,5 @@ class Tools:
         except RuntimeError:
             # No loop → safe to asyncio.run directly
             return asyncio.run(coro)
+
 
